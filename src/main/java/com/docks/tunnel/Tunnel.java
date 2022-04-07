@@ -1,4 +1,4 @@
-package com.docks.flow;
+package com.docks.tunnel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,43 +6,71 @@ import java.util.List;
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Tunnel implements Controllable {
+    private static final Logger logger = LoggerFactory.getLogger(Tunnel.class);
     private static final int MAX_CAPACITY = 5;
     private static final int MIN_CAPACITY = 0; 
 
     private List<Ship> ships;
+    private int shipsCount;
 
     public Tunnel() {
         this.ships = new ArrayList<>();
+        this.shipsCount = 0;
     }
 
     @Override
-    public synchronized void add() {
+    public boolean add(Ship ship) {
+        if (isFull(ship)) {
+            logger.error("Tunnel is full.");
+            return false;
+        }
 
+        ships.add(ship);
+        updateShipsCount();
+        return true;
     }
 
     @Override
-    public synchronized void remove() {
+    public Ship pull(ShipType type) {
+        if (isEmpty()) {
+            logger.error("Tunner is empty.");
+            return null;
+        }
 
+        Ship target = null;
+
+        for (Ship ship : ships) {
+            if (ship.getType().equals(type)) {
+                target = ship;
+                break;
+            }
+        }
+
+        if (target == null) {
+            logger.error("Ship with type [" + type + "] was not found.");
+            return null;
+        }
+
+        ships.remove(target);
+        updateShipsCount();
+        return target;
     }
 
-    @Override
-    public Ship getShipByType(ShipType type) {
-        return this.ships.stream()
-            .filter((ship) -> ship.getType() == type)
-            .findFirst()
-            .get();
-    }
-
-    public boolean isFull() {
-        return getSize() >= MAX_CAPACITY;
+    public boolean isFull(Ship ship) {
+        return shipsCount + ship.getCount() > MAX_CAPACITY;
     }
 
     public boolean isEmpty() {
-        return getSize() == MIN_CAPACITY;
+        return shipsCount == MIN_CAPACITY;
     }
 
-    private int getSize() {
-        return this.ships.size();
+    private void updateShipsCount() {
+        for (Ship ship : ships) {
+            this.shipsCount += ship.getCount();
+        }
     }
 }
