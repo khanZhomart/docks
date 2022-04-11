@@ -6,16 +6,13 @@ import java.util.concurrent.Semaphore;
 
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
+import com.docks.utils.constants.Constants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Tunnel implements Controllable {
     private static final Logger logger = LoggerFactory.getLogger(Tunnel.class);
-    private static final int MAX_CAPACITY = 5;
-    private static final int MIN_CAPACITY = 0; 
-
-    private Semaphore semaphore;
 
     private List<Ship> ships;
     private int shipsCount;
@@ -26,9 +23,9 @@ public class Tunnel implements Controllable {
     }
 
     @Override
-    public boolean push(Ship ship) {
-        if (isFull(ship)) {
-            logger.error("Tunnel is full.");
+    public synchronized boolean push(Ship ship) {
+        if (!isAbleToPush(ship)) {
+            logger.warn("Tunnel is full.");
             return false;
         }
 
@@ -38,7 +35,7 @@ public class Tunnel implements Controllable {
     }
 
     @Override
-    public Ship pull(ShipType type) {
+    public synchronized Ship pull(ShipType type) {
         if (isEmpty()) {
             return null;
         }
@@ -54,12 +51,16 @@ public class Tunnel implements Controllable {
         return target;
     }
 
-    public boolean isFull(Ship ship) {
-        return shipsCount + ship.getCount() > MAX_CAPACITY;
+    public boolean isAbleToPush(Ship ship) {
+        return shipsCount + ship.getCount() <= Constants.MAX_TUNNEL_CAPACITY;
+    }
+
+    public boolean isFull() {
+        return shipsCount >= Constants.MAX_TUNNEL_CAPACITY;
     }
 
     public boolean isEmpty() {
-        return shipsCount == MIN_CAPACITY;
+        return shipsCount == Constants.MIN_TUNNEL_CAPACITY;
     }
 
     public boolean isNonValid(Object o) {
@@ -71,6 +72,13 @@ public class Tunnel implements Controllable {
             .filter((s) -> s.getType().equals(type))
             .findFirst()
             .orElse(null);
+    }
+
+    public boolean existsByType(ShipType type) {
+        return ships.stream()
+            .filter((s) -> s.getType().equals(type))
+            .findFirst()
+            .isPresent();
     }
 
     private void updateShipsCount() {

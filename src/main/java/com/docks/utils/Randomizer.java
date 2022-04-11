@@ -6,6 +6,14 @@ import com.docks.models.types.ShipSize;
 import com.docks.models.types.ShipType;
 
 public class Randomizer {
+    
+    public static int getRandomNumber(int max) {
+        return new Random().nextInt(max);
+    }
+
+    public static int getRandomNumber(int min, int max) {
+        return new Random().nextInt(max) + min;
+    }
 
     public static class Ship {
         private static final int SHIP_TYPE_LENGTH = ShipType.values().length;
@@ -20,13 +28,5 @@ public class Randomizer {
             final int n = getRandomNumber(SHIP_SIZE_LENGTH);
             return ShipSize.values()[n];
         }
-    }
-    
-    public static int getRandomNumber(int max) {
-        return new Random().nextInt(max);
-    }
-
-    public static int getRandomNumber(int min, int max) {
-        return new Random().nextInt(max) + min;
     }
 }
