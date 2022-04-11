@@ -4,6 +4,6 @@ import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 
 public interface Controllable {
-    boolean add(Ship ship);
+    boolean push(Ship ship);
     Ship pull(ShipType type);
 }

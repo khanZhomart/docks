@@ -1,14 +1,16 @@
 package com.docks.services;
 
+import java.util.stream.IntStream;
+
 import com.docks.models.Ship;
 import com.docks.tunnel.Tunnel;
 import com.docks.utils.Randomizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 public class ShipGenerator implements Generator, Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(ShipGenerator.class);
+    // private static final Logger logger = LoggerFactory.getLogger(ShipGenerator.class);
 
     private Tunnel tunnel;
     private int count;
@@ -20,12 +22,10 @@ public class ShipGenerator implements Generator, Runnable {
 
     @Override
     public void run() {
-        Ship ship;
-
-        for (int i = 0; i < count; i++) {
-            ship = getRandomShip();
-            tunnel.add(ship);
-        }
+        IntStream.range(0, count)
+            .forEach((i) -> {
+                tunnel.push(getRandomShip());
+            });
     }
 
     @Override

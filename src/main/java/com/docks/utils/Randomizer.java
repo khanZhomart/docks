@@ -8,13 +8,17 @@ import com.docks.models.types.ShipType;
 public class Randomizer {
 
     public static class Ship {
+        private static final int SHIP_TYPE_LENGTH = ShipType.values().length;
+        private static final int SHIP_SIZE_LENGTH = ShipSize.values().length;
 
         public static ShipType getRandomType() {
-            return ShipType.values()[getRandomNumber(ShipType.values().length)];
+            final int n = getRandomNumber(SHIP_TYPE_LENGTH);
+            return ShipType.values()[n];
         }
     
         public static ShipSize getRandomSize() {
-            return ShipSize.values()[getRandomNumber(ShipSize.values().length)];
+            final int n = getRandomNumber(SHIP_SIZE_LENGTH);
+            return ShipSize.values()[n];
         }
     }
     

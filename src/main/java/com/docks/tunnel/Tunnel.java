@@ -2,6 +2,7 @@ package com.docks.tunnel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
@@ -14,6 +15,8 @@ public class Tunnel implements Controllable {
     private static final int MAX_CAPACITY = 5;
     private static final int MIN_CAPACITY = 0; 
 
+    private Semaphore semaphore;
+
     private List<Ship> ships;
     private int shipsCount;
 
@@ -23,7 +26,7 @@ public class Tunnel implements Controllable {
     }
 
     @Override
-    public boolean add(Ship ship) {
+    public boolean push(Ship ship) {
         if (isFull(ship)) {
             logger.error("Tunnel is full.");
             return false;
@@ -37,21 +40,12 @@ public class Tunnel implements Controllable {
     @Override
     public Ship pull(ShipType type) {
         if (isEmpty()) {
-            logger.error("Tunner is empty.");
             return null;
         }
 
-        Ship target = null;
+        Ship target = findByType(type);
 
-        for (Ship ship : ships) {
-            if (ship.getType().equals(type)) {
-                target = ship;
-                break;
-            }
-        }
-
-        if (target == null) {
-            logger.error("Ship with type [" + type + "] was not found.");
+        if (isNonValid(target)) {
             return null;
         }
 
@@ -68,9 +62,20 @@ public class Tunnel implements Controllable {
         return shipsCount == MIN_CAPACITY;
     }
 
+    public boolean isNonValid(Object o) {
+        return o == null;
+    }
+
+    public Ship findByType(ShipType type) {
+        return ships.stream()
+            .filter((s) -> s.getType().equals(type))
+            .findFirst()
+            .orElse(null);
+    }
+
     private void updateShipsCount() {
-        for (Ship ship : ships) {
-            this.shipsCount += ship.getCount();
-        }
+        shipsCount = ships.stream()
+            .map(Ship::getCount)
+            .reduce(0, Integer::sum);
     }
 }
