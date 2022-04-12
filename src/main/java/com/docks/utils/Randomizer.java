@@ -2,6 +2,7 @@ package com.docks.utils;
 
 import java.util.Random;
 
+import com.docks.models.Ship;
 import com.docks.models.types.ShipSize;
 import com.docks.models.types.ShipType;
 
@@ -15,7 +16,7 @@ public class Randomizer {
         return new Random().nextInt(max) + min;
     }
 
-    public static class Ship {
+    public static class ShipRandomizer {
         private static final ShipType[] types = ShipType.values();
         private static final ShipSize[] sizes = ShipSize.values();
 
@@ -27,6 +28,13 @@ public class Randomizer {
         public static ShipSize getRandomSize() {
             final int n = getRandomNumber(sizes.length);
             return sizes[n];
+        }
+
+        public static Ship getRandomShip() {
+            return new Ship.Builder()
+                .type(getRandomType())
+                .size(getRandomSize())
+                .build();
         }
     }
 }

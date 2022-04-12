@@ -5,15 +5,13 @@ import java.util.stream.Stream;
 import com.docks.models.Ship;
 import com.docks.models.types.ShipSize;
 import com.docks.models.types.ShipType;
+import com.docks.utils.Randomizer.ShipRandomizer;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TunnelTest {
-    private static final Logger logger = LoggerFactory.getLogger(TunnelTest.class);
     private static final Tunnel tunnel = new Tunnel();
     private static final ShipType[] types = ShipType.values();
     private static Ship ship;
@@ -26,12 +24,13 @@ public class TunnelTest {
 
     @Test
     public void should_ReturnFalseOnPush_When_TooManyShips() {
-        ship = new Ship.Builder()
-            .size(ShipSize.SMALL)
-            .type(ShipType.CLOTHING)
-            .build();
+        boolean result = true;
 
-        boolean result = tunnel.push(ship);
+        for (int i = 0; i < 6; i++) {
+            Ship ship = ShipRandomizer.getRandomShip();
+            result = tunnel.push(ship);
+        }
+
         Assert.assertFalse(result);
     }
 
