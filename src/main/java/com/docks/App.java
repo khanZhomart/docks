@@ -6,30 +6,34 @@ import java.util.concurrent.Semaphore;
 
 import com.docks.models.types.ShipType;
 import com.docks.piers.PierHandler;
-import com.docks.services.ShipGenerator;
+import com.docks.services.generator.ShipGenerator;
 import com.docks.tunnel.Tunnel;
+import com.docks.utils.PierUtility;
 
 /**
  * Hello world!
  *
  */
 public class App {
-    public static void main( String[] args ) {
+    
+    public static void main(String[] args) {
         Tunnel tunnel = new Tunnel();
         Semaphore sem = new Semaphore(1);
 
-        ShipGenerator generator = new ShipGenerator(tunnel, 5);
+        ShipGenerator generator = new ShipGenerator(tunnel, 10);
         
-        PierHandler breadHandler = new PierHandler(tunnel, ShipType.BREAD, sem);
-        PierHandler bananaHandler = new PierHandler(tunnel, ShipType.BANANA, sem);
-        PierHandler clothingHandler = new PierHandler(tunnel, ShipType.CLOTHING, sem);
+        PierUtility.init(tunnel, sem);
 
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        PierHandler breadHandler = PierUtility.getBreadHandler();
+        PierHandler bananaHandler = PierUtility.getBananaHandler();
+        PierHandler clothingHandler = PierUtility.getClothingHandler();
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         executor.execute(generator);
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

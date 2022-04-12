@@ -2,6 +2,7 @@ package com.docks.piers;
 
 import java.util.concurrent.Semaphore;
 
+import com.docks.models.Pier;
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 import com.docks.tunnel.Tunnel;
@@ -9,53 +10,54 @@ import com.docks.tunnel.Tunnel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PierHandler implements Runnable {
+public class PierHandler extends Pier implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(PierHandler.class);
 
-    private Semaphore semaphore;
-
-    private Tunnel tunnel;
-    private ShipType type;
-
     public PierHandler(Tunnel tunnel, ShipType type, Semaphore semaphore) {
-        this.tunnel = tunnel;
-        this.type = type;
-        this.semaphore = semaphore;
+        super(tunnel, type, semaphore);
     }
 
     @Override
     public void run() {
-        Thread.currentThread().setName(type + " Handler");
+        Thread.currentThread().setName(this.type + " Handler");
 
         try {
-            logger.warn("[SEMAPHORE] waiting for permission.");
-            semaphore.acquire();
+            logger.info("[SEMAPHORE] waiting for permission.");
+            this.semaphore.acquire();
             unloadShips();
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
         } finally {
-            semaphore.release();
-            logger.warn("[SEMAPHORE] released semaphore\n");
+            if (this.semaphore != null) {
+                this.semaphore.release();
+            }
+
+            logger.info("[SEMAPHORE] released semaphore\n");
         }
     }
 
     public void unloadShips() throws InterruptedException {
-        Ship ship;
-
-        if (!tunnel.existsByType(type)) {
-            logger.warn("No <" + type + "> was found.");
+        if (!this.tunnel.existsByType(type)) {
+            logger.info("No <" + this.type + "> was found.");
             return;
         }
 
-        while (tunnel.existsByType(type)) {
-            ship = tunnel.pull(type);
-            logger.info((2 * ship.getCount()) + "s. - " + "Unloading <" + type + "> ships from tunnel.");
-            wait(ship.getCount());
-            logger.info("Done.");
-        }
-    }
+        while (this.tunnel.existsByType(this.type)) {
+            Ship ship = this.tunnel.pull(this.type);
 
-    private void wait(int count) throws InterruptedException {
-        Thread.sleep(2000 * count);
+            if (ship == null) {
+                break;
+            }
+
+            try {
+                int time = 1000 + (ship.getSize() * 20);
+                
+                logger.info(time + " ms. - " + "Unloading <" + this.type + "> ship from tunnel.");
+                Thread.sleep(time);
+                logger.info("Done.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

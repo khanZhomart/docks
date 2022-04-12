@@ -16,17 +16,17 @@ public class Randomizer {
     }
 
     public static class Ship {
-        private static final int SHIP_TYPE_LENGTH = ShipType.values().length;
-        private static final int SHIP_SIZE_LENGTH = ShipSize.values().length;
+        private static final ShipType[] types = ShipType.values();
+        private static final ShipSize[] sizes = ShipSize.values();
 
         public static ShipType getRandomType() {
-            final int n = getRandomNumber(SHIP_TYPE_LENGTH);
-            return ShipType.values()[n];
+            final int n = getRandomNumber(types.length);
+            return types[n];
         }
     
         public static ShipSize getRandomSize() {
-            final int n = getRandomNumber(SHIP_SIZE_LENGTH);
-            return ShipSize.values()[n];
+            final int n = getRandomNumber(sizes.length);
+            return sizes[n];
         }
     }
 }

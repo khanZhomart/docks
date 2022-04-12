@@ -1,70 +1,45 @@
 package com.docks.tunnel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 import com.docks.utils.constants.Constants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 
 public class Tunnel implements Controllable {
-    private static final Logger logger = LoggerFactory.getLogger(Tunnel.class);
+    // private static final Logger logger = LoggerFactory.getLogger(Tunnel.class);
 
-    private List<Ship> ships;
-    private int shipsCount;
-
-    public Tunnel() {
-        this.ships = new ArrayList<>();
-        this.shipsCount = 0;
-    }
+    private List<Ship> ships = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public synchronized boolean push(Ship ship) {
-        if (!isAbleToPush(ship)) {
-            logger.warn("Tunnel is full.");
+    public boolean push(Ship ship) {
+        if (isFull()) {
             return false;
         }
 
         ships.add(ship);
-        updateShipsCount();
         return true;
     }
 
     @Override
-    public synchronized Ship pull(ShipType type) {
+    public Ship pull(ShipType type) {
         if (isEmpty()) {
             return null;
         }
 
-        Ship target = findByType(type);
+        Ship ship = findByType(type);
 
-        if (isNonValid(target)) {
+        if (isNonValid(ship)) {
             return null;
         }
 
-        ships.remove(target);
-        updateShipsCount();
-        return target;
-    }
-
-    public boolean isAbleToPush(Ship ship) {
-        return shipsCount + ship.getCount() <= Constants.MAX_TUNNEL_CAPACITY;
-    }
-
-    public boolean isFull() {
-        return shipsCount >= Constants.MAX_TUNNEL_CAPACITY;
-    }
-
-    public boolean isEmpty() {
-        return shipsCount == Constants.MIN_TUNNEL_CAPACITY;
-    }
-
-    public boolean isNonValid(Object o) {
-        return o == null;
+        ships.remove(ship);
+        return ship;
     }
 
     public Ship findByType(ShipType type) {
@@ -80,10 +55,20 @@ public class Tunnel implements Controllable {
             .findFirst()
             .isPresent();
     }
+    
+    public boolean isFull() {
+        return ships.size() >= Constants.MAX_TUNNEL_CAPACITY;
+    }
 
-    private void updateShipsCount() {
-        shipsCount = ships.stream()
-            .map(Ship::getCount)
-            .reduce(0, Integer::sum);
+    public boolean isEmpty() {
+        return ships.isEmpty();
+    }
+
+    public boolean isNonValid(Ship ship) {
+        return ship == null;
+    }
+
+    public int getSize() {
+        return this.ships.size();
     }
 }

@@ -1,4 +1,4 @@
-package com.docks.services;
+package com.docks.services.generator;
 
 import com.docks.models.Ship;
 
