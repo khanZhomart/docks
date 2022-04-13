@@ -1,5 +1,6 @@
 package com.docks.services.generator;
 
+import com.docks.models.Ship;
 import com.docks.tunnel.Tunnel;
 import com.docks.utils.Randomizer.ShipRandomizer;
 
@@ -22,8 +23,11 @@ public class ShipGenerator implements Runnable {
         Thread.currentThread().setName("GENERATOR");
 
         for (int i = 0; i < count; i++) {
-            if (!tunnel.push(ShipRandomizer.getRandomShip())) {
+            if (tunnel.isFull()) {
                 break;
+            } else {
+                Ship ship = ShipRandomizer.getRandomShip();
+                tunnel.push(ship);
             }
         }
     }

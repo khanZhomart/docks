@@ -23,7 +23,6 @@ public class App {
         ShipGenerator generator = new ShipGenerator(tunnel, 10);
         
         PierUtility.init(tunnel, sem);
-
         PierHandler breadHandler = PierUtility.getBreadHandler();
         PierHandler bananaHandler = PierUtility.getBananaHandler();
         PierHandler clothingHandler = PierUtility.getClothingHandler();
