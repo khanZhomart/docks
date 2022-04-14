@@ -3,6 +3,7 @@ package com.docks;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import com.docks.piers.PierHandler;
 import com.docks.services.generator.ShipGenerator;
@@ -27,7 +28,7 @@ public class App {
         executor.execute(generator);
 
         try {
-            Thread.sleep(2000);
+            executor.awaitTermination(5_000, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

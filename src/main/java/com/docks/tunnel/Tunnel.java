@@ -1,21 +1,21 @@
 package com.docks.tunnel;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.docks.utils.constants.Constants;
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 
 public class Tunnel implements Controllable {
-    private ArrayBlockingQueue<Ship> ships = new ArrayBlockingQueue<>(Constants.MAX_TUNNEL_CAPACITY);
+    private ConcurrentLinkedQueue<Ship> ships = new ConcurrentLinkedQueue<>(new ArrayList<>());
 
     @Override
     public void push(Ship ship) {
-        try {
-            ships.add(ship);
-        } catch (IllegalArgumentException e) {
+        if (!available()) {
             return;
         }
+
+        ships.add(ship);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class Tunnel implements Controllable {
     }
 
     public boolean available() {
-        return this.ships.remainingCapacity() > 0;
+        return this.ships.size() < 5;
     }
     
     public int getSize() {
