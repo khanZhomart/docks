@@ -4,16 +4,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
-import com.docks.models.types.ShipType;
 import com.docks.piers.PierHandler;
 import com.docks.services.generator.ShipGenerator;
 import com.docks.tunnel.Tunnel;
 import com.docks.utils.PierUtility;
 
-/**
- * Hello world!
- *
- */
 public class App {
     
     public static void main(String[] args) {

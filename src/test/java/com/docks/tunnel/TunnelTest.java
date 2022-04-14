@@ -23,26 +23,28 @@ public class TunnelTest {
     }
 
     @Test
-    public void should_ReturnFalseOnPush_When_TooManyShips() {
-        boolean result = true;
-
-        for (int i = 0; i < 6; i++) {
-            Ship ship = ShipRandomizer.getRandomShip();
-            result = tunnel.push(ship);
-        }
-
-        Assert.assertFalse(result);
+    public void should_ThrowIllegalArgumentException_When_TooManyShips() {
+        Assert.assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+                for (int i = 0; i < 6; i++) {
+                    Ship ship = ShipRandomizer.getRandomShip();
+                    tunnel.push(ship);
+                }
+            } 
+        );
     }
 
     @Test 
     public void should_ReturnTrueOnPush() {
-        ship = new Ship.Builder()
+        Ship expected = new Ship.Builder()
             .size(ShipSize.SMALL)
             .type(ShipType.CLOTHING)
             .build();
 
-        boolean result = tunnel.push(ship);
-        Assert.assertTrue(result);
+        tunnel.push(ship);
+        Ship actual = tunnel.findByType(ShipType.CLOTHING);
+        Assert.assertEquals(expected, actual);
     }
 
     @Test

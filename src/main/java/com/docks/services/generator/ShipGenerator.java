@@ -23,12 +23,13 @@ public class ShipGenerator implements Runnable {
         Thread.currentThread().setName("GENERATOR");
 
         for (int i = 0; i < count; i++) {
-            if (tunnel.isFull()) {
-                break;
-            } else {
+            try {
                 Ship ship = ShipRandomizer.getRandomShip();
                 tunnel.push(ship);
-            }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                break;
+            } 
         }
     }
 }
