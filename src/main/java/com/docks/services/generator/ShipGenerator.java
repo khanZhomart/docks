@@ -4,11 +4,11 @@ import com.docks.models.Ship;
 import com.docks.tunnel.Tunnel;
 import com.docks.utils.Randomizer.ShipRandomizer;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ShipGenerator implements Runnable {
-    // private static final Logger logger = LoggerFactory.getLogger(ShipGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShipGenerator.class);
 
     private Tunnel tunnel;
     private int count;
@@ -23,13 +23,12 @@ public class ShipGenerator implements Runnable {
         Thread.currentThread().setName("GENERATOR");
 
         for (int i = 0; i < count; i++) {
-            try {
-                Ship ship = ShipRandomizer.getRandomShip();
-                tunnel.push(ship);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+            if (!tunnel.available()) {
                 break;
-            } 
+            }
+            
+            Ship ship = ShipRandomizer.getRandomShip();
+            tunnel.push(ship);                
         }
     }
 }

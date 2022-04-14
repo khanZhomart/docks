@@ -2,20 +2,20 @@ package com.docks.tunnel;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
+import com.docks.utils.constants.Constants;
 import com.docks.models.Ship;
 import com.docks.models.types.ShipType;
 
-// import org.slf4j.Logger;
-// import org.slf4j.LoggerFactory;
-
 public class Tunnel implements Controllable {
-    // private static final Logger logger = LoggerFactory.getLogger(Tunnel.class);
-
-    private ArrayBlockingQueue<Ship> ships = new ArrayBlockingQueue<>(5);
+    private ArrayBlockingQueue<Ship> ships = new ArrayBlockingQueue<>(Constants.MAX_TUNNEL_CAPACITY);
 
     @Override
-    public void push(Ship ship) throws IllegalArgumentException {
-        ships.add(ship);  
+    public void push(Ship ship) {
+        try {
+            ships.add(ship);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
     }
 
     @Override
@@ -37,6 +37,10 @@ public class Tunnel implements Controllable {
             .filter((s) -> s.getType().equals(type))
             .findFirst()
             .isPresent();
+    }
+
+    public boolean available() {
+        return this.ships.remainingCapacity() > 0;
     }
     
     public int getSize() {

@@ -15,7 +15,7 @@ public class TunnelTest {
     private static final Tunnel tunnel = new Tunnel();
     private static final ShipType[] types = ShipType.values();
     private static Ship ship;
-    
+
     @After
     public void cleanTunnel() {
         Stream.of(types)
@@ -36,7 +36,7 @@ public class TunnelTest {
     }
 
     @Test 
-    public void should_ReturnTrueOnPush() {
+    public void should_PushShip() {
         Ship expected = new Ship.Builder()
             .size(ShipSize.SMALL)
             .type(ShipType.CLOTHING)

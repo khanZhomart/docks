@@ -22,17 +22,12 @@ public class PierHandler extends Pier implements Runnable {
         Thread.currentThread().setName(this.type + " Handler");
 
         try {
-            logger.info("[SEMAPHORE] waiting for permission.");
-            this.semaphore.acquire();
+            acquirePermission();
             unloadShips();
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
         } finally {
-            if (this.semaphore != null) {
-                this.semaphore.release();
-            }
-
-            logger.info("[SEMAPHORE] released semaphore\n");
+            permit();
         }
     }
 
@@ -42,7 +37,7 @@ public class PierHandler extends Pier implements Runnable {
             return;
         }
 
-        while (this.tunnel.existsByType(this.type)) {
+        while (true) {
             Ship ship = this.tunnel.pull(this.type);
 
             if (ship == null) {
@@ -58,6 +53,20 @@ public class PierHandler extends Pier implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void acquirePermission() throws InterruptedException {
+        if (semaphore != null) {
+            logger.info("[SEMAPHORE] waiting for permission.");
+            this.semaphore.acquire();
+        }
+    }
+
+    private void permit() {
+        if (this.semaphore != null) {
+            this.semaphore.release();
+            logger.info("[SEMAPHORE] released semaphore");
         }
     }
 }
